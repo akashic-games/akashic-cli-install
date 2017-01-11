@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "noLib": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "outDir": "./lib",
+    "declaration": true
+  },
+  "filesGlob": [
+    "./node_modules/typescript/lib/lib.core.es6.d.ts",
+    "./typings/*.d.ts",
+    "./src/**/*.ts"
+  ],
+  "files": [
+    "./node_modules/typescript/lib/lib.es6.d.ts",
+    "./typings/index.d.ts",
+    "./typings/fs-readdir-recursive.d.ts",
+    "./src/cli.ts",
+    "./src/index.ts"
+  ]
+}
