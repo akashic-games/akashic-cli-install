@@ -29,4 +29,11 @@ export class Configuration extends cmn.Configuration {
 			this._content.globalScripts = this._content.globalScripts.concat(filepaths);
 		}
 	}
+
+	addToModuleMainScripts(packageJsonFiles: string[]): void {
+		this._logger.info("Adding file paths to moduleMainScripts...");
+		var moduleMainScripts = this._content.moduleMainScripts || {};
+		Object.assign(moduleMainScripts, cmn.NodeModules.listModuleMainScripts(packageJsonFiles));
+		this._content.moduleMainScripts = moduleMainScripts;
+	}
 }

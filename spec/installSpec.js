@@ -117,12 +117,15 @@ describe("install()", function () {
 			.then((content) => {
 				var globalScripts = content.globalScripts;
 				expect(globalScripts instanceof Array).toBe(true);
-				expect(globalScripts.length).toBe(5);
+				expect(globalScripts.length).toBe(3);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).not.toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/main.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
 				expect(shrinkwrapCalled).toBe(true);
 				shrinkwrapCalled = false;
 			})
@@ -136,14 +139,17 @@ describe("install()", function () {
 					}
 				]);
 				var globalScripts = content.globalScripts;
-				expect(globalScripts.length).toBe(7);
+				expect(globalScripts.length).toBe(5);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy2/index.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy2/sub.js")).not.toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/main.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
 				expect(shrinkwrapCalled).toBe(true);
 			})
 			.then(() => {
@@ -175,11 +181,14 @@ describe("install()", function () {
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/index2.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/sub2.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/foo/foo.js")).toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/index2.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
 			})
 			.then(done, done.fail);
 	});
