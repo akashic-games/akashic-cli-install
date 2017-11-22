@@ -50,7 +50,15 @@ describe("install()", function () {
 	});
 
 	it("installs modules and update globalScripts", function (done) {
-		var logger = new cmn.ConsoleLogger({ quiet: true, debugLogMethod: () => {/* do nothing */} });
+		var warnLogs = [];
+		var logger = {
+			warn: function(message) {
+				warnLogs.push(message);
+			},
+			info: function(message) {
+				// do nothing
+			}
+		};
 
 		var mockModules = {
 			"dummy": {
@@ -126,6 +134,9 @@ describe("install()", function () {
 					"dummy": "node_modules/dummy/main.js",
 					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
 				});
+				expect(warnLogs.length).toBe(1);
+				expect(warnLogs[0]).toBe("`moduleMainScripts` doesn\'t existed in game.json. Please use akashic-engine@>=2.0.1, >=1.11.2");
+				warnLogs = []; // 初期化
 				expect(shrinkwrapCalled).toBe(true);
 				shrinkwrapCalled = false;
 			})
@@ -178,6 +189,8 @@ describe("install()", function () {
 			.then(() => cmn.ConfigurationFile.read("./somedir/game.json", logger))
 			.then((content) => {
 				var globalScripts = content.globalScripts;
+
+				expect(warnLogs.length).toBe(0);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).toBe(-1);
