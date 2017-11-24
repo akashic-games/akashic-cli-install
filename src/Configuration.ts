@@ -32,11 +32,16 @@ export class Configuration extends cmn.Configuration {
 
 	addToModuleMainScripts(packageJsonFiles: string[]): void {
 		this._logger.info("Adding file paths to moduleMainScripts...");
-		if (! this._content.moduleMainScripts) {
-			this._logger.warn("`moduleMainScripts` doesn't existed in game.json. Please use akashic-engine@>=2.0.1, >=1.11.2");
+		var moduleMainScripts = cmn.NodeModules.listModuleMainScripts(packageJsonFiles);
+		if (moduleMainScripts && Object.keys(moduleMainScripts).length > 0) {
+			if (! this._content.moduleMainScripts) {
+				this._logger.warn(
+					"Newly added the moduleMainScripts property to game.json." +
+					"This property, introduced by akashic-cli@>=X.Y.Z, is NOT supported by older versions of Akashic Engine." +
+					"Please ensure that you are using akashic-engine@>=2.0.1, >=1.11.2."
+				);
+			}
+			this._content.moduleMainScripts = Object.assign(this._content.moduleMainScripts || {}, moduleMainScripts);
 		}
-		var moduleMainScripts = this._content.moduleMainScripts || {};
-		Object.assign(moduleMainScripts, cmn.NodeModules.listModuleMainScripts(packageJsonFiles));
-		this._content.moduleMainScripts = moduleMainScripts;
 	}
 }

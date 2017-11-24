@@ -135,7 +135,11 @@ describe("install()", function () {
 					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
 				});
 				expect(warnLogs.length).toBe(1);
-				expect(warnLogs[0]).toBe("`moduleMainScripts` doesn\'t existed in game.json. Please use akashic-engine@>=2.0.1, >=1.11.2");
+				expect(warnLogs[0]).toBe(
+					"Newly added the moduleMainScripts property to game.json." +
+					"This property, introduced by akashic-cli@>=X.Y.Z, is NOT supported by older versions of Akashic Engine." +
+					"Please ensure that you are using akashic-engine@>=2.0.1, >=1.11.2."
+				);
 				warnLogs = []; // 初期化
 				expect(shrinkwrapCalled).toBe(true);
 				shrinkwrapCalled = false;
