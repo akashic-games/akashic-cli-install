@@ -50,7 +50,15 @@ describe("install()", function () {
 	});
 
 	it("installs modules and update globalScripts", function (done) {
-		var logger = new cmn.ConsoleLogger({ quiet: true, debugLogMethod: () => {/* do nothing */} });
+		var warnLogs = [];
+		var logger = {
+			warn: function(message) {
+				warnLogs.push(message);
+			},
+			info: function(message) {
+				// do nothing
+			}
+		};
 
 		var mockModules = {
 			"dummy": {
@@ -117,12 +125,22 @@ describe("install()", function () {
 			.then((content) => {
 				var globalScripts = content.globalScripts;
 				expect(globalScripts instanceof Array).toBe(true);
-				expect(globalScripts.length).toBe(5);
+				expect(globalScripts.length).toBe(3);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).not.toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/main.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
+				expect(warnLogs.length).toBe(1);
+				expect(warnLogs[0]).toBe(
+					"Newly added the moduleMainScripts property to game.json." +
+					"This property, introduced by akashic-cli@>=X.Y.Z, is NOT supported by older versions of Akashic Engine." +
+					"Please ensure that you are using akashic-engine@>=2.0.1, >=1.11.2."
+				);
+				warnLogs = []; // 初期化
 				expect(shrinkwrapCalled).toBe(true);
 				shrinkwrapCalled = false;
 			})
@@ -136,14 +154,17 @@ describe("install()", function () {
 					}
 				]);
 				var globalScripts = content.globalScripts;
-				expect(globalScripts.length).toBe(7);
+				expect(globalScripts.length).toBe(5);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy2/index.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy2/sub.js")).not.toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/main.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
 				expect(shrinkwrapCalled).toBe(true);
 			})
 			.then(() => {
@@ -172,14 +193,19 @@ describe("install()", function () {
 			.then(() => cmn.ConfigurationFile.read("./somedir/game.json", logger))
 			.then((content) => {
 				var globalScripts = content.globalScripts;
+
+				expect(warnLogs.length).toBe(0);
 				expect(globalScripts.indexOf("node_modules/dummy/main.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/foo.js")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/main.js")).toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/node_modules/dummyChild/package.json")).toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/index2.js")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/dummy/sub2.js")).not.toBe(-1);
-				expect(globalScripts.indexOf("node_modules/dummy/package.json")).not.toBe(-1);
 				expect(globalScripts.indexOf("node_modules/foo/foo.js")).toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/index2.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+				});
 			})
 			.then(done, done.fail);
 	});

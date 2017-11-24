@@ -80,8 +80,14 @@ export function promiseInstall(param: InstallParameterObject): Promise<void> {
 							.then(() => npm.shrinkwrap());
 					}
 				})
-				.then(() => cmn.NodeModules.listModuleFiles(".", param.moduleNames))
-				.then((filePaths: string[]) => conf.addToGlobalScripts(filePaths))
+				.then(() => cmn.NodeModules.listScriptFiles(".", param.moduleNames, param.logger))
+				.then((filePaths: string[]) => {
+					conf.addToGlobalScripts(filePaths);
+					const packageJsonFiles = cmn.NodeModules.listPackageJsonsFromScriptsPath(".", filePaths);
+					if (packageJsonFiles) {
+						conf.addToModuleMainScripts(packageJsonFiles);
+					}
+				})
 				.then(() => {
 					if (param.plugin != null)
 						conf.addOperationPlugin(param.plugin, param.moduleNames[0]);
