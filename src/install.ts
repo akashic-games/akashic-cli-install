@@ -41,6 +41,7 @@ export interface InstallParameterObject {
 
 	/**
 	 * インストール時に対象モジュールの package.json のパスを `globalScripts` に追加するかどうか。
+	 * 省略された場合、 `false`
 	 */
 	noOmitPackagejson?: boolean;
 }
