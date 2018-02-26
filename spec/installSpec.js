@@ -87,7 +87,15 @@ describe("install()", function () {
 			"dummy2": {
 				"index.js": "require('./sub')",
 				"sub.js": "",
-			}
+			},
+			"noOmitPackagejson": {
+				"package.json": JSON.stringify({
+					name: "noOmitPackagejson",
+					version: "0.0.0",
+					main: "main.js"
+				}),
+				"main.js": "module.exports = 1;"
+			},
 		};
 		var mockFsContent = {
 			"somedir": {
@@ -166,6 +174,23 @@ describe("install()", function () {
 					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
 				});
 				expect(shrinkwrapCalled).toBe(true);
+				warnLogs = []; // 初期化
+			})
+			.then(() => promiseInstall({ moduleNames: ["noOmitPackagejson@0.0.0"], cwd: "./somedir", logger: logger, debugNpm: dummyNpm, noOmitPackagejson: true }))
+			.then(() => cmn.ConfigurationFile.read("./somedir/game.json", logger))
+			.then((content) => {
+				var globalScripts = content.globalScripts;
+
+				expect(warnLogs.length).toBe(0);
+				expect(globalScripts.indexOf("node_modules/noOmitPackagejson/main.js")).not.toBe(-1);
+				expect(globalScripts.indexOf("node_modules/noOmitPackagejson/package.json")).not.toBe(-1);
+				var moduleMainScripts = content.moduleMainScripts;
+				expect(moduleMainScripts).toEqual({
+					"dummy": "node_modules/dummy/main.js",
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js",
+					"noOmitPackagejson": "node_modules/noOmitPackagejson/main.js"
+				});
+				warnLogs = []; // 初期化
 			})
 			.then(() => {
 				// dummyモジュールの定義を書き換えて反映されるか確認する
@@ -204,7 +229,8 @@ describe("install()", function () {
 				var moduleMainScripts = content.moduleMainScripts;
 				expect(moduleMainScripts).toEqual({
 					"dummy": "node_modules/dummy/index2.js",
-					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+					"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js",
+					"noOmitPackagejson": "node_modules/noOmitPackagejson/main.js"
 				});
 			})
 			.then(done, done.fail);

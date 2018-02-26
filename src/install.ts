@@ -38,6 +38,11 @@ export interface InstallParameterObject {
 	 * デバッグ用: 利用するnpmのインスタンス。
 	 */
 	debugNpm?: cmn.PromisedNpm;
+
+	/**
+	 * インストール時に対象モジュールの package.json のパスを `globalScripts` に追加するかどうか。
+	 */
+	noOmitPackagejson?: boolean;
 }
 
 export function _completeInstallParameterObject(param: InstallParameterObject): void {
@@ -45,6 +50,7 @@ export function _completeInstallParameterObject(param: InstallParameterObject): 
 	param.link = !!param.link;
 	param.cwd = param.cwd || process.cwd();
 	param.logger = param.logger || new cmn.ConsoleLogger();
+	param.noOmitPackagejson = !!param.noOmitPackagejson;
 }
 
 export function promiseInstall(param: InstallParameterObject): Promise<void> {
@@ -80,7 +86,10 @@ export function promiseInstall(param: InstallParameterObject): Promise<void> {
 							.then(() => npm.shrinkwrap());
 					}
 				})
-				.then(() => cmn.NodeModules.listScriptFiles(".", param.moduleNames, param.logger))
+				.then(() => {
+					const listFiles = param.noOmitPackagejson ? cmn.NodeModules.listModuleFiles : cmn.NodeModules.listScriptFiles;
+					return listFiles(".", param.moduleNames, param.logger);
+				})
 				.then((filePaths: string[]) => {
 					conf.addToGlobalScripts(filePaths);
 					const packageJsonFiles = cmn.NodeModules.listPackageJsonsFromScriptsPath(".", filePaths);
