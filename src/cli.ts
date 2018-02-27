@@ -38,7 +38,7 @@ commander
 	.option("-C, --cwd <dir>", "The directory incluedes game.json")
 	.option("-q, --quiet", "Suppress output")
 	.option("-p, --plugin <code>", "Also add to operationPlugins with the code", (x: string) => parseInt(x, 10))
-	.option("--no-omit-packagejson", "Include modules' paths of package.json in `globalScripts` property of game.json");
+	.option("--no-omit-packagejson", "Add package.json of each module to the globalScripts property (to support older Akashic Engine)");
 
 export function run(argv: string[]): void {
 	commander.parse(argv);
