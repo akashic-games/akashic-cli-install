@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.2
+* コマンド引数 `--no-omit-packagejson` を追加
+
 ## 0.3.1
 * `moduleMainScript` が存在しなかった場合の警告メッセージの対象エンジンバージョンが誤っていたのを修正
 
