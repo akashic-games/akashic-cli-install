@@ -10,11 +10,14 @@ export interface CommandParameterObject {
 	link?: boolean;
 	quiet?: boolean;
 	plugin?: number;
+	omitPackagejson?: boolean;
 }
 
 function cli(param: CommandParameterObject): void {
 	var logger = new ConsoleLogger({ quiet: param.quiet });
-	var installParam = { moduleNames: param.args, cwd: param.cwd, plugin: param.plugin, logger: logger, link: param.link };
+	var installParam = {
+		moduleNames: param.args, cwd: param.cwd, plugin: param.plugin, logger: logger, link: param.link, noOmitPackagejson: !param.omitPackagejson
+	};
 	Promise.resolve()
 		.then(() => promiseInstall(installParam))
 		.catch((err: any) => {
@@ -34,7 +37,8 @@ commander
 	.option("-l, --link", "Do npm link instead of npm install")
 	.option("-C, --cwd <dir>", "The directory incluedes game.json")
 	.option("-q, --quiet", "Suppress output")
-	.option("-p, --plugin <code>", "Also add to operationPlugins with the code", (x: string) => parseInt(x, 10));
+	.option("-p, --plugin <code>", "Also add to operationPlugins with the code", (x: string) => parseInt(x, 10))
+	.option("--no-omit-packagejson", "Add package.json of each module to the globalScripts property (to support older Akashic Engine)");
 
 export function run(argv: string[]): void {
 	commander.parse(argv);
