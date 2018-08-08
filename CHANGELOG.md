@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.3
+* 各種依存モジュールの更新
+* 内部モジュールを以下のように更新
+  * `akashic-cli-commons@0.2.9`
+
 ## 0.3.2
 * コマンド引数 `--no-omit-packagejson` を追加
 
