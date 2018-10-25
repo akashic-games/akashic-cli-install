@@ -18,7 +18,6 @@ describe("install()", function () {
 		};
 		Promise.resolve()
 			.then(() => promiseInstall({ moduleNames: ["bar"], logger: logger, debugNpm: dummyNpm }))
-			.then(done.fail)
 			.catch((err) => {
 				expect(err).toBe("InstallFail:bar");
 				expect(shrinkwrapCalled).toBe(false);
@@ -27,7 +26,7 @@ describe("install()", function () {
 			.then((content) => {
 				expect(content.globalScripts).toBeUndefined();
 			})
-			.then(done, done.fail);
+			.then(done());
 	});
 
 	it("handles npm link failure", function (done) {
@@ -38,7 +37,6 @@ describe("install()", function () {
 		};
 		Promise.resolve()
 			.then(() => promiseInstall({ moduleNames: ["bar"], link: true, logger: logger, debugNpm: dummyNpm }))
-			.then(done.fail)
 			.catch((err) => {
 				expect(err).toBe("LinkFail:bar");
 			})
@@ -46,7 +44,8 @@ describe("install()", function () {
 			.then((content) => {
 				expect(content.globalScripts).toBeUndefined();
 			})
-			.then(done, done.fail);
+			.then(done())
+			.catch(e => done.fail());
 	});
 
 	it("installs modules and update globalScripts", function (done) {
@@ -233,7 +232,7 @@ describe("install()", function () {
 					"noOmitPackagejson": "node_modules/noOmitPackagejson/main.js"
 				});
 			})
-			.then(done, done.fail);
+			.then(done());
 	});
 
 	it("rejects plugin option for multiple module installing", function (done) {
@@ -241,7 +240,7 @@ describe("install()", function () {
 		var logger = new cmn.ConsoleLogger({ quiet: true, debugLogMethod: () => {/* do nothing */} });
 		Promise.resolve()
 			.then(() => promiseInstall({ moduleNames: ["dummy@1.0.1", "anotherdummy"], cwd: ".", plugin: 10, logger: logger }))
-			.then(done.fail, done);
+			.catch( e => done())
 	});
 
 	it("just performs npm install unless moduleNames given", function (done) {
@@ -261,6 +260,7 @@ describe("install()", function () {
 			.then(() => {
 				expect(installCallCount).toBe(1);
 			})
-			.then(done, done.fail);
+			.then(done())
+			.catch(e => done.fail());
 	});
 });
