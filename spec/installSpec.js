@@ -46,7 +46,7 @@ describe("install()", function () {
 			.then((content) => {
 				expect(content.globalScripts).toBeUndefined();
 			})
-			.then(done(), done.fail);
+			.then(done, done.fail);
 	});
 
 	it("installs modules and update globalScripts", function (done) {
