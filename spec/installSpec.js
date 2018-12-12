@@ -242,7 +242,7 @@ describe("install()", function () {
 		Promise.resolve()
 			.then(() => promiseInstall({ moduleNames: ["dummy@1.0.1", "anotherdummy"], cwd: ".", plugin: 10, logger: logger }))
 			.then(done.fail)
-			.catch ((err) =>  done() );
+			.catch ((err) => done());
 	});
 
 	it("just performs npm install unless moduleNames given", function (done) {
