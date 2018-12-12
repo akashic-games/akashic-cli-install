@@ -241,7 +241,8 @@ describe("install()", function () {
 		var logger = new cmn.ConsoleLogger({ quiet: true, debugLogMethod: () => {/* do nothing */} });
 		Promise.resolve()
 			.then(() => promiseInstall({ moduleNames: ["dummy@1.0.1", "anotherdummy"], cwd: ".", plugin: 10, logger: logger }))
-			.then(done.fail, done);
+			.then(done.fail)
+			.catch ((err) =>  done() );
 	});
 
 	it("just performs npm install unless moduleNames given", function (done) {
